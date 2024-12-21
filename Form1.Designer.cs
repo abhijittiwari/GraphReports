@@ -264,7 +264,7 @@
             tabPage3.Name = "tabPage3";
             tabPage3.Size = new Size(676, 122);
             tabPage3.TabIndex = 2;
-            tabPage3.Text = "Subscription Reports";
+            tabPage3.Text = "Other Reports";
             tabPage3.UseVisualStyleBackColor = true;
             // 
             // buttonGetSubs
