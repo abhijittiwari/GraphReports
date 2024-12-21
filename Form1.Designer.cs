@@ -38,6 +38,9 @@
             dataGridView1 = new DataGridView();
             progressBar1 = new ProgressBar();
             tabPage3 = new TabPage();
+            groupBox1 = new GroupBox();
+            textBoxDomainName = new TextBox();
+            buttonGetDomainDependency = new Button();
             buttonGetDomains = new Button();
             buttonGetSubs = new Button();
             tabPage2 = new TabPage();
@@ -56,6 +59,7 @@
             tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             tabPage3.SuspendLayout();
+            groupBox1.SuspendLayout();
             tabPage2.SuspendLayout();
             tabPage1.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -147,6 +151,7 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(groupBox1);
             tabPage3.Controls.Add(buttonGetDomains);
             tabPage3.Controls.Add(buttonGetSubs);
             tabPage3.Location = new Point(4, 24);
@@ -155,6 +160,34 @@
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Other Reports";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(textBoxDomainName);
+            groupBox1.Controls.Add(buttonGetDomainDependency);
+            groupBox1.Location = new Point(271, 3);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(128, 116);
+            groupBox1.TabIndex = 5;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Get Domain Dependency";
+            // 
+            // textBoxDomainName
+            // 
+            textBoxDomainName.Location = new Point(6, 41);
+            textBoxDomainName.Name = "textBoxDomainName";
+            textBoxDomainName.Size = new Size(116, 23);
+            textBoxDomainName.TabIndex = 5;
+            // 
+            // buttonGetDomainDependency
+            // 
+            buttonGetDomainDependency.Location = new Point(3, 70);
+            buttonGetDomainDependency.Name = "buttonGetDomainDependency";
+            buttonGetDomainDependency.Size = new Size(119, 40);
+            buttonGetDomainDependency.TabIndex = 4;
+            buttonGetDomainDependency.Text = "Get Dependency";
+            buttonGetDomainDependency.UseVisualStyleBackColor = true;
+            buttonGetDomainDependency.Click += buttonGetDomainDependency_Click;
             // 
             // buttonGetDomains
             // 
@@ -335,6 +368,8 @@
             tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             tabPage3.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             tabPage2.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabControl1.ResumeLayout(false);
@@ -367,5 +402,8 @@
         private Button buttonGetSynced;
         private Button buttonGetAllUsers;
         private TabControl tabControl1;
+        private Button buttonGetDomainDependency;
+        private GroupBox groupBox1;
+        private TextBox textBoxDomainName;
     }
 }

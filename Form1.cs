@@ -1210,5 +1210,75 @@ namespace GraphReports
             }
             progressBar1.Visible = false;
         }
+
+        private async void buttonGetDomainDependency_Click(object sender, EventArgs e)
+        {
+            progressBar1.Visible = true;
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            try
+            {
+                var scopes = new[] { "Domain.Read.All", "Directory.Read.All" };
+
+                // Tenant ID and Client ID from textboxes
+                var tenantId = textBoxTenant.Text;
+                var clientId = textBoxClientID.Text;
+
+                // Interactive browser credential options
+                var options = new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ClientId = clientId,
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                    RedirectUri = new Uri("http://localhost"),
+                };
+
+                var interactiveCredential = new InteractiveBrowserCredential(options);
+                var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+
+                // Initialize progress bar
+                progressBar1.Text = "Getting Domain Dependencies";
+
+                // Fetch domains
+                var domains = await graphClient.Domains[textBoxDomainName.Text].GetAsync();
+
+                if (domains?.Id != null)
+                {
+                    var domainDependencies = new List<dynamic>();
+
+                    
+                        var domainName = textBoxDomainName.Text;
+                        var domainObjects = await graphClient.Domains[domainName].DomainNameReferences.GetAsync();
+
+                        if (domainObjects?.Value != null)
+                        {
+                            domainDependencies.AddRange(domainObjects.Value.Select(obj => new
+                            {
+                                DomainName = domainName,
+                                ObjectId = obj.Id ?? "Not Available",
+                                ObjectType = obj.OdataType ?? "Not Available"
+                            }));
+                        }
+                    
+
+                    if (domainDependencies.Any())
+                    {
+                        dataGridView1.DataSource = domainDependencies;
+                    }
+                    else
+                    {
+                        MessageBox.Show("No domain dependencies found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No domains found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            progressBar1.Visible = false;
+        }
     }
 }
