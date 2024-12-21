@@ -460,7 +460,7 @@ namespace GraphReports
                                 OnPremisesLastSyncDateTime = group.OnPremisesLastSyncDateTime?.UtcDateTime.ToString() ?? "Not Available",
                                 OnPremisesSecurityIdentifier = group.OnPremisesSecurityIdentifier ?? "Not Available",
                                 OnPremisesDomainName = group.OnPremisesDomainName ?? "Not Available",
-                                MemberCount = memberCount
+                                MemberCount = memberCount?? 0
                             });
                         }
                     }
@@ -543,22 +543,31 @@ namespace GraphReports
                 {
                     if (groupsPage.Value != null)
                     {
-                        allGroups.AddRange(groupsPage.Value.Select(group => new
+                        foreach (var group in groupsPage.Value)
                         {
-                            Id = group.Id ?? "Not Available",
-                            DisplayName = group.DisplayName ?? "Not Available",
-                            Description = group.Description ?? "Not Available",
-                            Mail = group.Mail ?? "Not Available",
-                            MailEnabled = group.MailEnabled?.ToString() ?? "Not Available",
-                            SecurityEnabled = group.SecurityEnabled?.ToString() ?? "Not Available",
-                            Visibility = group.Visibility ?? "Not Available",
-                            GroupTypes = group.GroupTypes != null && group.GroupTypes.Any()
+                            var memberCount = await graphClient.Groups[group.Id].Members.Count.GetAsync((requestConfiguration) =>
+                            {
+                                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+                            });
+                            allGroups.AddRange(groupsPage.Value.Select(group => new
+                            {
+                                Id = group.Id ?? "Not Available",
+                                DisplayName = group.DisplayName ?? "Not Available",
+                                MemberCount = memberCount,
+                                Description = group.Description ?? "Not Available",
+                                Mail = group.Mail ?? "Not Available",
+                                MailEnabled = group.MailEnabled?.ToString() ?? "Not Available",
+                                SecurityEnabled = group.SecurityEnabled?.ToString() ?? "Not Available",
+                                Visibility = group.Visibility ?? "Not Available",
+                                GroupTypes = group.GroupTypes != null && group.GroupTypes.Any()
                                 ? string.Join(", ", group.GroupTypes)
                                 : "Not Available",
-                            LicenseProcessingState = group.LicenseProcessingState?.State ?? "Not Available",
-                            Team = group.Team != null ? "Team Enabled" : "Not a Team",
-                            CreatedDateTime = group.CreatedDateTime?.UtcDateTime.ToString() ?? "Not Available"
-                        }));
+                                LicenseProcessingState = group.LicenseProcessingState?.State ?? "Not Available",
+                                Team = group.Team != null ? "Team Enabled" : "Not a Team",
+                                CreatedDateTime = group.CreatedDateTime?.UtcDateTime.ToString() ?? "Not Available",
+                                 
+                            }));
+                        }
                     }
 
                     // Get the next page if available
