@@ -1153,9 +1153,62 @@ namespace GraphReports
             progressBar1.Visible = false;
         }
 
-        private void buttonGetDomains_Click(object sender, EventArgs e)
+        private async void buttonGetDomains_Click(object sender, EventArgs e)
         {
+            progressBar1.Visible = true;
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            try
+            {
+                var scopes = new[] { "Domain.Read.All", "Directory.Read.All" };
 
+                // Tenant ID and Client ID from textboxes
+                var tenantId = textBoxTenant.Text;
+                var clientId = textBoxClientID.Text;
+
+                // Interactive browser credential options
+                var options = new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ClientId = clientId,
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                    RedirectUri = new Uri("http://localhost"),
+                };
+
+                var interactiveCredential = new InteractiveBrowserCredential(options);
+                var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+
+                // Initialize progress bar
+                progressBar1.Text = "Getting Domains";
+
+                // Fetch domains
+                var domains = await graphClient.Domains.GetAsync();
+
+                if (domains?.Value != null)
+                {
+                    var domainList = domains.Value.Select(domain => new
+                    {
+                        DomainName = domain.Id ?? "Not Available",
+                        IsVerified = domain.IsVerified?.ToString() ?? "Not Available",
+                        IsDefault = domain.IsDefault?.ToString() ?? "Not Available",
+                        AuthenticationType = domain.AuthenticationType ?? "Not Available",
+                        SupportedServices = domain.SupportedServices != null && domain.SupportedServices.Any()
+                            ? string.Join(", ", domain.SupportedServices)
+                            : "Not Available"
+
+                    }).ToList();
+
+                    dataGridView1.DataSource = domainList;
+                }
+                else
+                {
+                    MessageBox.Show("No domains found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            progressBar1.Visible = false;
         }
     }
 }
