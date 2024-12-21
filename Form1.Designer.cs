@@ -68,8 +68,8 @@
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 2;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.63415F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 85.36585F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 19.7329369F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80.26706F));
             tableLayoutPanel1.Controls.Add(textBoxTenant, 1, 2);
             tableLayoutPanel1.Controls.Add(label1, 0, 0);
             tableLayoutPanel1.Controls.Add(label3, 0, 2);
@@ -86,9 +86,9 @@
             // textBoxTenant
             // 
             textBoxTenant.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxTenant.Location = new Point(101, 32);
+            textBoxTenant.Location = new Point(135, 32);
             textBoxTenant.Name = "textBoxTenant";
-            textBoxTenant.Size = new Size(570, 23);
+            textBoxTenant.Size = new Size(536, 23);
             textBoxTenant.TabIndex = 5;
             textBoxTenant.Text = "25412cef-d489-431e-87a3-8d6aa23d0853";
             // 
@@ -106,16 +106,16 @@
             label3.AutoSize = true;
             label3.Location = new Point(3, 29);
             label3.Name = "label3";
-            label3.Size = new Size(65, 30);
+            label3.Size = new Size(103, 15);
             label3.TabIndex = 2;
             label3.Text = "Tenant ID/Domain";
             // 
             // textBoxClientID
             // 
             textBoxClientID.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxClientID.Location = new Point(101, 3);
+            textBoxClientID.Location = new Point(135, 3);
             textBoxClientID.Name = "textBoxClientID";
-            textBoxClientID.Size = new Size(570, 23);
+            textBoxClientID.Size = new Size(536, 23);
             textBoxClientID.TabIndex = 3;
             textBoxClientID.Text = "6733563a-6624-404c-aaa1-5a860b0a721a";
             // 
