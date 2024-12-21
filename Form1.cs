@@ -436,25 +436,33 @@ namespace GraphReports
                 {
                     if (groupsPage.Value != null)
                     {
-                        allGroups.AddRange(groupsPage.Value.Select(group => new
+                        foreach (var group in groupsPage.Value)
                         {
-                            Id = group.Id ?? "Not Available",
-                            DisplayName = group.DisplayName ?? "Not Available",
-                            Description = group.Description ?? "Not Available",
-                            Mail = group.Mail ?? "Not Available",
-                            MailEnabled = group.MailEnabled?.ToString() ?? "Not Available",
-                            SecurityEnabled = group.SecurityEnabled?.ToString() ?? "Not Available",
-                            Visibility = group.Visibility ?? "Not Available",
-                            GroupTypes = group.GroupTypes != null && group.GroupTypes.Any()
-                                ? string.Join(", ", group.GroupTypes)
-                                : "Not Available",
-                            LicenseProcessingState = group.LicenseProcessingState?.State ?? "Not Available",
-                            Team = group.Team != null ? "Team Enabled" : "Not a Team",
-                            OnPremisesSyncEnabled = group.OnPremisesSyncEnabled?.ToString() ?? "Not Available",
-                            OnPremisesLastSyncDateTime = group.OnPremisesLastSyncDateTime?.UtcDateTime.ToString() ?? "Not Available",
-                            OnPremisesSecurityIdentifier = group.OnPremisesSecurityIdentifier ?? "Not Available",
-                            OnPremisesDomainName = group.OnPremisesDomainName ?? "Not Available",
-                        }));
+                            var memberCount = await graphClient.Groups[group.Id].Members.Count.GetAsync((requestConfiguration) =>
+                            {
+                                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+                            });
+                            allGroups.Add(new
+                            {
+                                Id = group.Id ?? "Not Available",
+                                DisplayName = group.DisplayName ?? "Not Available",
+                                Description = group.Description ?? "Not Available",
+                                Mail = group.Mail ?? "Not Available",
+                                MailEnabled = group.MailEnabled?.ToString() ?? "Not Available",
+                                SecurityEnabled = group.SecurityEnabled?.ToString() ?? "Not Available",
+                                Visibility = group.Visibility ?? "Not Available",
+                                GroupTypes = group.GroupTypes != null && group.GroupTypes.Any()
+                                    ? string.Join(", ", group.GroupTypes)
+                                    : "Not Available",
+                                LicenseProcessingState = group.LicenseProcessingState?.State ?? "Not Available",
+                                Team = group.Team != null ? "Team Enabled" : "Not a Team",
+                                OnPremisesSyncEnabled = group.OnPremisesSyncEnabled?.ToString() ?? "Not Available",
+                                OnPremisesLastSyncDateTime = group.OnPremisesLastSyncDateTime?.UtcDateTime.ToString() ?? "Not Available",
+                                OnPremisesSecurityIdentifier = group.OnPremisesSecurityIdentifier ?? "Not Available",
+                                OnPremisesDomainName = group.OnPremisesDomainName ?? "Not Available",
+                                MemberCount = memberCount
+                            });
+                        }
                     }
 
                     // Get the next page if available
@@ -1386,6 +1394,86 @@ namespace GraphReports
                 progressBar1.Visible = false;
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private async void buttonGetGroupMembers_Click(object sender, EventArgs e)
+        {
+            progressBar1.Visible = true;
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            try
+            {
+                var scopes = new[] { "Group.Read.All", "GroupMember.Read.All", "Directory.Read.All" };
+
+                // Tenant ID and Client ID from textboxes
+                var tenantId = textBoxTenant.Text;
+                var clientId = textBoxClientID.Text;
+
+                // Interactive browser credential options
+                var options = new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ClientId = clientId,
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                    RedirectUri = new Uri("http://localhost"),
+                };
+
+                var interactiveCredential = new InteractiveBrowserCredential(options);
+                var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+
+                // Initialize progress bar
+                progressBar1.Text = "Getting Group Members";
+
+                // Fetch group by display name
+                var groupName = textBoxGroupName.Text;
+                var groups = await graphClient.Groups.GetAsync(requestConfiguration =>
+                {
+                    requestConfiguration.QueryParameters.Filter = $"startswith(displayName,'{groupName}')";
+
+                    requestConfiguration.QueryParameters.Select = new[] { "Id", "DisplayName" };
+                });
+
+                if (groups?.Value != null && groups.Value.Any())
+                {
+                    var groupId = groups.Value.First().Id;
+
+                    // Fetch group members
+                    var members = await graphClient.Groups[groupId].Members.GetAsync(requestConfiguration=>
+                    {
+                        requestConfiguration.QueryParameters.Select = new[] { "Id", "displayName", "mail" };
+                        requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+
+                    });
+
+                    if (members?.Value != null)
+                    {
+                        var memberList = members.Value.Select(member => new
+                        {
+                            DisplayName = member.AdditionalData?.ContainsKey("displayName") == true
+                                ? member.AdditionalData["displayName"]?.ToString()
+                                : "Not Available",
+                            mail = member.AdditionalData?.ContainsKey("mail") == true
+                                ? member.AdditionalData["userPrincipalName"]?.ToString()
+                                : "Not Available",
+                            Id = member.Id ?? "Not Available"
+                        }).ToList();
+
+                        dataGridView1.DataSource = memberList;
+                    }
+                    else
+                    {
+                        MessageBox.Show("No members found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Group not found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            progressBar1.Visible = false;
         }
     }
 }

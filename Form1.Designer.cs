@@ -44,6 +44,9 @@
             buttonGetDomains = new Button();
             buttonGetSubs = new Button();
             tabPage2 = new TabPage();
+            groupBox2 = new GroupBox();
+            textBoxGroupName = new TextBox();
+            buttonGetGroupMembers = new Button();
             buttonGetLicensedGroups = new Button();
             buttonMailEnabledSec = new Button();
             buttonGetAllSec = new Button();
@@ -62,6 +65,7 @@
             tabPage3.SuspendLayout();
             groupBox1.SuspendLayout();
             tabPage2.SuspendLayout();
+            groupBox2.SuspendLayout();
             tabPage1.SuspendLayout();
             tabControl1.SuspendLayout();
             SuspendLayout();
@@ -212,6 +216,7 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(groupBox2);
             tabPage2.Controls.Add(buttonGetLicensedGroups);
             tabPage2.Controls.Add(buttonMailEnabledSec);
             tabPage2.Controls.Add(buttonGetAllSec);
@@ -226,6 +231,35 @@
             tabPage2.Text = "Group Reports";
             tabPage2.UseVisualStyleBackColor = true;
             // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(textBoxGroupName);
+            groupBox2.Controls.Add(buttonGetGroupMembers);
+            groupBox2.Font = new Font("Segoe UI", 6.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            groupBox2.Location = new Point(542, 6);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(128, 116);
+            groupBox2.TabIndex = 7;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Get Group Members(Enter Name)";
+            // 
+            // textBoxGroupName
+            // 
+            textBoxGroupName.Location = new Point(6, 41);
+            textBoxGroupName.Name = "textBoxGroupName";
+            textBoxGroupName.Size = new Size(116, 19);
+            textBoxGroupName.TabIndex = 5;
+            // 
+            // buttonGetGroupMembers
+            // 
+            buttonGetGroupMembers.Location = new Point(3, 70);
+            buttonGetGroupMembers.Name = "buttonGetGroupMembers";
+            buttonGetGroupMembers.Size = new Size(119, 40);
+            buttonGetGroupMembers.TabIndex = 4;
+            buttonGetGroupMembers.Text = "Get Members";
+            buttonGetGroupMembers.UseVisualStyleBackColor = true;
+            buttonGetGroupMembers.Click += buttonGetGroupMembers_Click;
+            // 
             // buttonGetLicensedGroups
             // 
             buttonGetLicensedGroups.Location = new Point(6, 64);
@@ -238,7 +272,7 @@
             // 
             // buttonMailEnabledSec
             // 
-            buttonMailEnabledSec.Location = new Point(542, 6);
+            buttonMailEnabledSec.Location = new Point(140, 64);
             buttonMailEnabledSec.Name = "buttonMailEnabledSec";
             buttonMailEnabledSec.Size = new Size(128, 52);
             buttonMailEnabledSec.TabIndex = 5;
@@ -383,6 +417,8 @@
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             tabPage2.ResumeLayout(false);
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             tabPage1.ResumeLayout(false);
             tabControl1.ResumeLayout(false);
             ResumeLayout(false);
@@ -418,5 +454,8 @@
         private GroupBox groupBox1;
         private TextBox textBoxDomainName;
         private Button buttonGetLicensedGroups;
+        private GroupBox groupBox2;
+        private TextBox textBoxGroupName;
+        private Button buttonGetGroupMembers;
     }
 }
