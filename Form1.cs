@@ -1245,20 +1245,20 @@ namespace GraphReports
                 {
                     var domainDependencies = new List<dynamic>();
 
-                    
-                        var domainName = textBoxDomainName.Text;
-                        var domainObjects = await graphClient.Domains[domainName].DomainNameReferences.GetAsync();
 
-                        if (domainObjects?.Value != null)
+                    var domainName = textBoxDomainName.Text;
+                    var domainObjects = await graphClient.Domains[domainName].DomainNameReferences.GetAsync();
+
+                    if (domainObjects?.Value != null)
+                    {
+                        domainDependencies.AddRange(domainObjects.Value.Select(obj => new
                         {
-                            domainDependencies.AddRange(domainObjects.Value.Select(obj => new
-                            {
-                                DomainName = domainName,
-                                ObjectId = obj.Id ?? "Not Available",
-                                ObjectType = obj.OdataType ?? "Not Available"
-                            }));
-                        }
-                    
+                            DomainName = domainName,
+                            ObjectId = obj.Id ?? "Not Available",
+                            ObjectType = obj.OdataType ?? "Not Available"
+                        }));
+                    }
+
 
                     if (domainDependencies.Any())
                     {
@@ -1279,6 +1279,113 @@ namespace GraphReports
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             progressBar1.Visible = false;
+        }
+
+        private async void buttonGetLicensedGroups_Click(object sender, EventArgs e)
+        {
+            progressBar1.Visible = true;
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            try
+            {
+                var scopes = new[] { "Group.Read.All", "GroupMember.Read.All", "Directory.Read.All" };
+
+                // Tenant ID and Client ID from textboxes
+                var tenantId = textBoxTenant.Text;
+                var clientId = textBoxClientID.Text;
+
+                // Interactive browser credential options
+                var options = new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ClientId = clientId,
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                    RedirectUri = new Uri("http://localhost"),
+                };
+
+                var interactiveCredential = new InteractiveBrowserCredential(options);
+                var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+
+                // List to hold all groups (handles paginated responses)
+                var allGroups = new List<dynamic>();
+
+                // Initialize progress bar
+                progressBar1.Text = "Getting Licensed Groups";
+
+                // Paginated request
+                var groupsPage = await graphClient.Groups.GetAsync(requestConfiguration =>
+                {
+                    requestConfiguration.QueryParameters.Filter = "assignedLicenses/any()";
+                    requestConfiguration.QueryParameters.Select = new[]
+                    {
+                        "Id", "DisplayName", "Description", "Mail", "MailEnabled", "SecurityEnabled",
+                        "Visibility", "GroupTypes", "LicenseProcessingState", "Team", "OnPremisesSyncEnabled",
+                        "OnPremisesLastSyncDateTime", "OnPremisesSecurityIdentifier", "OnPremisesDomainName","assignedLicenses"
+                    };
+                });
+
+                // Loop through all pages
+                while (groupsPage != null)
+                {
+                    if (groupsPage.Value != null)
+                    {
+                        allGroups.AddRange(groupsPage.Value.Select(group => new
+                        {
+                            Id = group.Id ?? "Not Available",
+                            DisplayName = group.DisplayName ?? "Not Available",
+                            Description = group.Description ?? "Not Available",
+                            AssignedLicenses = group.AssignedLicenses != null && group.AssignedLicenses.Any()
+                                ? string.Join(", ", group.AssignedLicenses.Select(license => Mapping.GetProductNameBySkuId(license.SkuId.ToString())))
+                                : "No Assigned Licenses",
+                            Mail = group.Mail ?? "Not Available",
+                            MailEnabled = group.MailEnabled?.ToString() ?? "Not Available",
+                            SecurityEnabled = group.SecurityEnabled?.ToString() ?? "Not Available",
+                            Visibility = group.Visibility ?? "Not Available",
+                            GroupTypes = group.GroupTypes != null && group.GroupTypes.Any()
+                                ? string.Join(", ", group.GroupTypes)
+                                : "Not Available",
+                            LicenseProcessingState = group.LicenseProcessingState?.State ?? "Not Available",
+                            Team = group.Team != null ? "Team Enabled" : "Not a Team",
+                            OnPremisesSyncEnabled = group.OnPremisesSyncEnabled?.ToString() ?? "Not Available",
+                            OnPremisesLastSyncDateTime = group.OnPremisesLastSyncDateTime?.UtcDateTime.ToString() ?? "Not Available",
+                            OnPremisesSecurityIdentifier = group.OnPremisesSecurityIdentifier ?? "Not Available",
+                            OnPremisesDomainName = group.OnPremisesDomainName ?? "Not Available",
+                        }));
+                    }
+
+                    // Get the next page if available
+                    groupsPage = groupsPage.OdataNextLink != null
+                        ? await graphClient.Groups.GetAsync(requestConfiguration =>
+                        {
+                            requestConfiguration.QueryParameters.Filter = "assignedLicenses/any()";
+                            requestConfiguration.QueryParameters.Select = new[]
+                            {
+                                "Id", "DisplayName", "Description", "Mail", "MailEnabled", "SecurityEnabled",
+                                "Visibility", "GroupTypes", "LicenseProcessingState", "Team", "OnPremisesSyncEnabled",
+                                "OnPremisesLastSyncDateTime", "OnPremisesSecurityIdentifier", "OnPremisesDomainName"
+                            };
+                            requestConfiguration.QueryParameters.Skip = allGroups.Count;
+                        })
+                        : null;
+                }
+
+                // Hide progress bar
+                progressBar1.Visible = false;
+
+                // Display the data in a DataGridView
+                if (allGroups.Any())
+                {
+                    dataGridView1.DataSource = allGroups;
+                }
+                else
+                {
+                    MessageBox.Show("No licensed groups found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                progressBar1.Visible = false;
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

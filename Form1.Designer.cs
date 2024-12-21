@@ -44,6 +44,7 @@
             buttonGetDomains = new Button();
             buttonGetSubs = new Button();
             tabPage2 = new TabPage();
+            buttonGetLicensedGroups = new Button();
             buttonMailEnabledSec = new Button();
             buttonGetAllSec = new Button();
             buttonDistributionGroups = new Button();
@@ -211,6 +212,7 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(buttonGetLicensedGroups);
             tabPage2.Controls.Add(buttonMailEnabledSec);
             tabPage2.Controls.Add(buttonGetAllSec);
             tabPage2.Controls.Add(buttonDistributionGroups);
@@ -223,6 +225,16 @@
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Group Reports";
             tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // buttonGetLicensedGroups
+            // 
+            buttonGetLicensedGroups.Location = new Point(6, 64);
+            buttonGetLicensedGroups.Name = "buttonGetLicensedGroups";
+            buttonGetLicensedGroups.Size = new Size(128, 52);
+            buttonGetLicensedGroups.TabIndex = 6;
+            buttonGetLicensedGroups.Text = "Get All Licensed Groups";
+            buttonGetLicensedGroups.UseVisualStyleBackColor = true;
+            buttonGetLicensedGroups.Click += buttonGetLicensedGroups_Click;
             // 
             // buttonMailEnabledSec
             // 
@@ -405,5 +417,6 @@
         private Button buttonGetDomainDependency;
         private GroupBox groupBox1;
         private TextBox textBoxDomainName;
+        private Button buttonGetLicensedGroups;
     }
 }
