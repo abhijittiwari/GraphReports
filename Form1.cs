@@ -1115,7 +1115,7 @@ namespace GraphReports
                                     displayName = group?.DisplayName ?? "Not Available";
                                 }
 
-                                else if(member.OdataType=="#microsoft.graph.servicePrincipal")
+                                else if (member.OdataType == "#microsoft.graph.servicePrincipal")
                                 {
                                     var servicename = await graphClient.ServicePrincipals[member.Id].GetAsync();
                                     displayName = servicename?.AppDisplayName ?? "Not Available";
@@ -1151,6 +1151,11 @@ namespace GraphReports
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             progressBar1.Visible = false;
+        }
+
+        private void buttonGetDomains_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

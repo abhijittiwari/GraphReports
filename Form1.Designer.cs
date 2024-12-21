@@ -34,31 +34,31 @@
             label1 = new Label();
             label3 = new Label();
             textBoxClientID = new TextBox();
-            tabControl1 = new TabControl();
-            tabPage1 = new TabPage();
-            buttonGetAdmins = new Button();
-            buttonGetUnlicensed = new Button();
-            buttonGetGuests = new Button();
-            buttonGetSynced = new Button();
-            buttonGetAllUsers = new Button();
+            buttonExport = new Button();
+            dataGridView1 = new DataGridView();
+            progressBar1 = new ProgressBar();
+            tabPage3 = new TabPage();
+            buttonGetDomains = new Button();
+            buttonGetSubs = new Button();
             tabPage2 = new TabPage();
             buttonMailEnabledSec = new Button();
             buttonGetAllSec = new Button();
             buttonDistributionGroups = new Button();
             buttonUnifiedGroups = new Button();
             buttonGetAllGroups = new Button();
-            tabPage3 = new TabPage();
-            buttonGetSubs = new Button();
-            tabPage4 = new TabPage();
-            buttonExport = new Button();
-            dataGridView1 = new DataGridView();
-            progressBar1 = new ProgressBar();
+            tabPage1 = new TabPage();
+            buttonGetAdmins = new Button();
+            buttonGetUnlicensed = new Button();
+            buttonGetGuests = new Button();
+            buttonGetSynced = new Button();
+            buttonGetAllUsers = new Button();
+            tabControl1 = new TabControl();
             tableLayoutPanel1.SuspendLayout();
-            tabControl1.SuspendLayout();
-            tabPage1.SuspendLayout();
-            tabPage2.SuspendLayout();
-            tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            tabPage3.SuspendLayout();
+            tabPage2.SuspendLayout();
+            tabPage1.SuspendLayout();
+            tabControl1.SuspendLayout();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -115,82 +115,66 @@
             textBoxClientID.TabIndex = 3;
             textBoxClientID.Text = "6733563a-6624-404c-aaa1-5a860b0a721a";
             // 
-            // tabControl1
+            // buttonExport
             // 
-            tabControl1.Controls.Add(tabPage1);
-            tabControl1.Controls.Add(tabPage2);
-            tabControl1.Controls.Add(tabPage3);
-            tabControl1.Controls.Add(tabPage4);
-            tabControl1.Location = new Point(11, 135);
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(684, 150);
-            tabControl1.TabIndex = 1;
+            buttonExport.Location = new Point(561, 107);
+            buttonExport.Name = "buttonExport";
+            buttonExport.Size = new Size(124, 47);
+            buttonExport.TabIndex = 2;
+            buttonExport.Text = "Export to Excel";
+            buttonExport.UseVisualStyleBackColor = true;
+            buttonExport.Click += buttonExport_Click;
             // 
-            // tabPage1
+            // dataGridView1
             // 
-            tabPage1.Controls.Add(buttonGetAdmins);
-            tabPage1.Controls.Add(buttonGetUnlicensed);
-            tabPage1.Controls.Add(buttonGetGuests);
-            tabPage1.Controls.Add(buttonGetSynced);
-            tabPage1.Controls.Add(buttonGetAllUsers);
-            tabPage1.Location = new Point(4, 24);
-            tabPage1.Name = "tabPage1";
-            tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(676, 122);
-            tabPage1.TabIndex = 0;
-            tabPage1.Text = "User Reports";
-            tabPage1.UseVisualStyleBackColor = true;
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AllowUserToDeleteRows = false;
+            dataGridView1.AllowUserToOrderColumns = true;
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Location = new Point(14, 317);
+            dataGridView1.Name = "dataGridView1";
+            dataGridView1.ReadOnly = true;
+            dataGridView1.Size = new Size(671, 398);
+            dataGridView1.TabIndex = 3;
             // 
-            // buttonGetAdmins
+            // progressBar1
             // 
-            buttonGetAdmins.Location = new Point(544, 9);
-            buttonGetAdmins.Name = "buttonGetAdmins";
-            buttonGetAdmins.Size = new Size(128, 52);
-            buttonGetAdmins.TabIndex = 4;
-            buttonGetAdmins.Text = "Get All Admins";
-            buttonGetAdmins.UseVisualStyleBackColor = true;
-            buttonGetAdmins.Click += buttonGetAdmins_Click;
+            progressBar1.Location = new Point(14, 287);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new Size(140, 24);
+            progressBar1.TabIndex = 4;
+            progressBar1.Visible = false;
             // 
-            // buttonGetUnlicensed
+            // tabPage3
             // 
-            buttonGetUnlicensed.Location = new Point(410, 9);
-            buttonGetUnlicensed.Name = "buttonGetUnlicensed";
-            buttonGetUnlicensed.Size = new Size(128, 52);
-            buttonGetUnlicensed.TabIndex = 3;
-            buttonGetUnlicensed.Text = "Get All Unlicensed";
-            buttonGetUnlicensed.UseVisualStyleBackColor = true;
-            buttonGetUnlicensed.Click += buttonGetUnlicensed_Click;
+            tabPage3.Controls.Add(buttonGetDomains);
+            tabPage3.Controls.Add(buttonGetSubs);
+            tabPage3.Location = new Point(4, 24);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new Size(676, 122);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "Other Reports";
+            tabPage3.UseVisualStyleBackColor = true;
             // 
-            // buttonGetGuests
+            // buttonGetDomains
             // 
-            buttonGetGuests.Location = new Point(276, 9);
-            buttonGetGuests.Name = "buttonGetGuests";
-            buttonGetGuests.Size = new Size(128, 52);
-            buttonGetGuests.TabIndex = 2;
-            buttonGetGuests.Text = "Get All Guests";
-            buttonGetGuests.UseVisualStyleBackColor = true;
-            buttonGetGuests.Click += buttonGetGuests_Click;
+            buttonGetDomains.Location = new Point(137, 3);
+            buttonGetDomains.Name = "buttonGetDomains";
+            buttonGetDomains.Size = new Size(128, 52);
+            buttonGetDomains.TabIndex = 3;
+            buttonGetDomains.Text = "Get All Domains";
+            buttonGetDomains.UseVisualStyleBackColor = true;
+            buttonGetDomains.Click += buttonGetDomains_Click;
             // 
-            // buttonGetSynced
+            // buttonGetSubs
             // 
-            buttonGetSynced.Location = new Point(142, 9);
-            buttonGetSynced.Name = "buttonGetSynced";
-            buttonGetSynced.Size = new Size(128, 52);
-            buttonGetSynced.TabIndex = 1;
-            buttonGetSynced.Text = "Get All Synced Users";
-            buttonGetSynced.UseVisualStyleBackColor = true;
-            buttonGetSynced.Click += buttonGetSynced_Click;
-            // 
-            // buttonGetAllUsers
-            // 
-            buttonGetAllUsers.Location = new Point(8, 9);
-            buttonGetAllUsers.Name = "buttonGetAllUsers";
-            buttonGetAllUsers.Size = new Size(128, 52);
-            buttonGetAllUsers.TabIndex = 0;
-            buttonGetAllUsers.Text = "Get All Users";
-            buttonGetAllUsers.UseVisualStyleBackColor = true;
-            buttonGetAllUsers.Click += buttonGetAllUsers_Click;
+            buttonGetSubs.Location = new Point(3, 3);
+            buttonGetSubs.Name = "buttonGetSubs";
+            buttonGetSubs.Size = new Size(128, 52);
+            buttonGetSubs.TabIndex = 2;
+            buttonGetSubs.Text = "Get All Subsciption";
+            buttonGetSubs.UseVisualStyleBackColor = true;
+            buttonGetSubs.Click += buttonGetSubs_Click;
             // 
             // tabPage2
             // 
@@ -257,64 +241,81 @@
             buttonGetAllGroups.UseVisualStyleBackColor = true;
             buttonGetAllGroups.Click += buttonGetAllGroups_Click;
             // 
-            // tabPage3
+            // tabPage1
             // 
-            tabPage3.Controls.Add(buttonGetSubs);
-            tabPage3.Location = new Point(4, 24);
-            tabPage3.Name = "tabPage3";
-            tabPage3.Size = new Size(676, 122);
-            tabPage3.TabIndex = 2;
-            tabPage3.Text = "Other Reports";
-            tabPage3.UseVisualStyleBackColor = true;
+            tabPage1.Controls.Add(buttonGetAdmins);
+            tabPage1.Controls.Add(buttonGetUnlicensed);
+            tabPage1.Controls.Add(buttonGetGuests);
+            tabPage1.Controls.Add(buttonGetSynced);
+            tabPage1.Controls.Add(buttonGetAllUsers);
+            tabPage1.Location = new Point(4, 24);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(676, 122);
+            tabPage1.TabIndex = 0;
+            tabPage1.Text = "User Reports";
+            tabPage1.UseVisualStyleBackColor = true;
             // 
-            // buttonGetSubs
+            // buttonGetAdmins
             // 
-            buttonGetSubs.Location = new Point(3, 3);
-            buttonGetSubs.Name = "buttonGetSubs";
-            buttonGetSubs.Size = new Size(128, 52);
-            buttonGetSubs.TabIndex = 2;
-            buttonGetSubs.Text = "Get All Subsciption";
-            buttonGetSubs.UseVisualStyleBackColor = true;
-            buttonGetSubs.Click += buttonGetSubs_Click;
+            buttonGetAdmins.Location = new Point(544, 9);
+            buttonGetAdmins.Name = "buttonGetAdmins";
+            buttonGetAdmins.Size = new Size(128, 52);
+            buttonGetAdmins.TabIndex = 4;
+            buttonGetAdmins.Text = "Get All Admins";
+            buttonGetAdmins.UseVisualStyleBackColor = true;
+            buttonGetAdmins.Click += buttonGetAdmins_Click;
             // 
-            // tabPage4
+            // buttonGetUnlicensed
             // 
-            tabPage4.Location = new Point(4, 24);
-            tabPage4.Name = "tabPage4";
-            tabPage4.Size = new Size(676, 122);
-            tabPage4.TabIndex = 3;
-            tabPage4.Text = "Domain Reports";
-            tabPage4.UseVisualStyleBackColor = true;
+            buttonGetUnlicensed.Location = new Point(410, 9);
+            buttonGetUnlicensed.Name = "buttonGetUnlicensed";
+            buttonGetUnlicensed.Size = new Size(128, 52);
+            buttonGetUnlicensed.TabIndex = 3;
+            buttonGetUnlicensed.Text = "Get All Unlicensed";
+            buttonGetUnlicensed.UseVisualStyleBackColor = true;
+            buttonGetUnlicensed.Click += buttonGetUnlicensed_Click;
             // 
-            // buttonExport
+            // buttonGetGuests
             // 
-            buttonExport.Location = new Point(561, 107);
-            buttonExport.Name = "buttonExport";
-            buttonExport.Size = new Size(124, 47);
-            buttonExport.TabIndex = 2;
-            buttonExport.Text = "Export to Excel";
-            buttonExport.UseVisualStyleBackColor = true;
-            buttonExport.Click += buttonExport_Click;
+            buttonGetGuests.Location = new Point(276, 9);
+            buttonGetGuests.Name = "buttonGetGuests";
+            buttonGetGuests.Size = new Size(128, 52);
+            buttonGetGuests.TabIndex = 2;
+            buttonGetGuests.Text = "Get All Guests";
+            buttonGetGuests.UseVisualStyleBackColor = true;
+            buttonGetGuests.Click += buttonGetGuests_Click;
             // 
-            // dataGridView1
+            // buttonGetSynced
             // 
-            dataGridView1.AllowUserToAddRows = false;
-            dataGridView1.AllowUserToDeleteRows = false;
-            dataGridView1.AllowUserToOrderColumns = true;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(14, 317);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.ReadOnly = true;
-            dataGridView1.Size = new Size(671, 398);
-            dataGridView1.TabIndex = 3;
+            buttonGetSynced.Location = new Point(142, 9);
+            buttonGetSynced.Name = "buttonGetSynced";
+            buttonGetSynced.Size = new Size(128, 52);
+            buttonGetSynced.TabIndex = 1;
+            buttonGetSynced.Text = "Get All Synced Users";
+            buttonGetSynced.UseVisualStyleBackColor = true;
+            buttonGetSynced.Click += buttonGetSynced_Click;
             // 
-            // progressBar1
+            // buttonGetAllUsers
             // 
-            progressBar1.Location = new Point(14, 287);
-            progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(140, 24);
-            progressBar1.TabIndex = 4;
-            progressBar1.Visible = false;
+            buttonGetAllUsers.Location = new Point(8, 9);
+            buttonGetAllUsers.Name = "buttonGetAllUsers";
+            buttonGetAllUsers.Size = new Size(128, 52);
+            buttonGetAllUsers.TabIndex = 0;
+            buttonGetAllUsers.Text = "Get All Users";
+            buttonGetAllUsers.UseVisualStyleBackColor = true;
+            buttonGetAllUsers.Click += buttonGetAllUsers_Click;
+            // 
+            // tabControl1
+            // 
+            tabControl1.Controls.Add(tabPage1);
+            tabControl1.Controls.Add(tabPage2);
+            tabControl1.Controls.Add(tabPage3);
+            tabControl1.Location = new Point(11, 135);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(684, 150);
+            tabControl1.TabIndex = 1;
             // 
             // Form1
             // 
@@ -332,11 +333,11 @@
             Load += Form1_Load_1;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
-            tabControl1.ResumeLayout(false);
-            tabPage1.ResumeLayout(false);
-            tabPage2.ResumeLayout(false);
-            tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            tabPage3.ResumeLayout(false);
+            tabPage2.ResumeLayout(false);
+            tabPage1.ResumeLayout(false);
+            tabControl1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -347,24 +348,24 @@
         private Label label3;
         private TextBox textBoxClientID;
         private TextBox textBoxTenant;
-        private TabControl tabControl1;
-        private TabPage tabPage1;
-        private Button buttonGetAllUsers;
-        private TabPage tabPage2;
-        private TabPage tabPage3;
-        private TabPage tabPage4;
         private Button buttonExport;
         private DataGridView dataGridView1;
+        private ProgressBar progressBar1;
+        private TabPage tabPage3;
+        private Button buttonGetDomains;
+        private Button buttonGetSubs;
+        private TabPage tabPage2;
+        private Button buttonMailEnabledSec;
+        private Button buttonGetAllSec;
+        private Button buttonDistributionGroups;
+        private Button buttonUnifiedGroups;
+        private Button buttonGetAllGroups;
+        private TabPage tabPage1;
+        private Button buttonGetAdmins;
         private Button buttonGetUnlicensed;
         private Button buttonGetGuests;
         private Button buttonGetSynced;
-        private Button buttonGetAllGroups;
-        private Button buttonUnifiedGroups;
-        private ProgressBar progressBar1;
-        private Button buttonDistributionGroups;
-        private Button buttonGetAllSec;
-        private Button buttonMailEnabledSec;
-        private Button buttonGetSubs;
-        private Button buttonGetAdmins;
+        private Button buttonGetAllUsers;
+        private TabControl tabControl1;
     }
 }
