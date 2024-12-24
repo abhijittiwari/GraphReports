@@ -1548,7 +1548,7 @@ namespace GraphReports
                         allResults.AddRange(resultDetail);
                     }
 
-                    if (result.OdataNextLink != null)
+                    if (result?.OdataNextLink != null)
                     {
                         result = await graphClient.Reports.AuthenticationMethods.UserRegistrationDetails.WithUrl(result.OdataNextLink).GetAsync();
                     }
