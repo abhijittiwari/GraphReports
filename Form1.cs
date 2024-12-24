@@ -70,7 +70,7 @@ namespace GraphReports
                         LastSignInActivity = user.SignInActivity?.LastSignInDateTime?.UtcDateTime.ToString() ?? "No Sign In Activity",
                         ID = user.Id ?? "Not Available",
                         AccountEnabled = user.AccountEnabled?.ToString() ?? "Not Available",
-                        Manager = user.Manager?.Id != null ? GetUserPrincipalName(graphClient, user.Manager.Id).Result : "Not Available",
+                        Manager = user.Manager?.Id != null ? GetManager(graphClient, user.Manager.Id).Result : "Not Available",
                         City = user.City ?? "Not Available",
                         Country = user.Country ?? "Not Available",
                         Department = user.Department ?? "Not Available",
@@ -101,23 +101,16 @@ namespace GraphReports
             progressBar1.Visible = false;
         }
 
-        private async Task<string> GetUserPrincipalName(GraphServiceClient graphClient, string managerId)
+        private async Task<string> GetManager(GraphServiceClient graphClient, string managerId)
         {
             var manager = await graphClient.Users[managerId].GetAsync(requestConfiguration =>
             {
-                requestConfiguration.QueryParameters.Select = new[] { "UserPrincipalName" };
+                requestConfiguration.QueryParameters.Expand = new string[] { "manager($levels=max;$select=userPrincipalName)" };
+                requestConfiguration.QueryParameters.Select = new string[] { "userPrincipalName" };
+                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
             });
 
             return manager?.UserPrincipalName ?? "Not Available";
-        }
-
-
-
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-
         }
 
         private async void buttonGetSynced_Click(object sender, EventArgs e)
@@ -162,7 +155,7 @@ namespace GraphReports
                         Email = user.Mail ?? "Not Available",
                         JobTitle = user.JobTitle ?? "Not Available",
                         UserPrincipalName = user.UserPrincipalName ?? "Not Available",
-                        Manager = user.Manager?.Id != null ? GetUserPrincipalName(graphClient, user.Manager.Id).Result : "Not Available",
+                        Manager = user.Manager?.Id != null ? GetManager(graphClient, user.Manager.Id).Result : "Not Available",
                         ID = user.Id ?? "Not Available",
                         AccountEnabled = user.AccountEnabled?.ToString() ?? "Not Available",
                         City = user.City ?? "Not Available",
@@ -349,7 +342,7 @@ namespace GraphReports
         Email = user.Mail ?? "Not Available",
         JobTitle = user.JobTitle ?? "Not Available",
         UserPrincipalName = user.UserPrincipalName ?? "Not Available",
-        Manager = user.Manager?.Id != null ? GetUserPrincipalName(graphClient, user.Manager.Id).Result : "Not Available",
+        Manager = user.Manager?.Id != null ? GetManager(graphClient, user.Manager.Id).Result : "Not Available",
         ID = user.Id ?? "Not Available",
         AccountEnabled = user.AccountEnabled?.ToString() ?? "Not Available",
         City = user.City ?? "Not Available",
@@ -1017,10 +1010,6 @@ namespace GraphReports
             }
         }
 
-        private void Form1_Load_1(object sender, EventArgs e)
-        {
-
-        }
 
         private async void buttonGetSubs_Click(object sender, EventArgs e)
         {
