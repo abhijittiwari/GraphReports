@@ -491,19 +491,14 @@ namespace GraphReports
                         }
                     }
 
-                    // Get the next page if available
-                    groupsPage = groupsPage.OdataNextLink != null
-                        ? await graphClient.Groups.GetAsync(requestConfiguration =>
-                        {
-                            requestConfiguration.QueryParameters.Select = new[]
-                            {
-                                "Id", "DisplayName", "Description", "Mail", "MailEnabled", "SecurityEnabled",
-                                "Visibility", "GroupTypes", "LicenseProcessingState", "Team", "OnPremisesSyncEnabled",
-                                "OnPremisesLastSyncDateTime", "OnPremisesSecurityIdentifier", "OnPremisesDomainName"
-                            };
-                            requestConfiguration.QueryParameters.Skip = allGroups.Count;
-                        })
-                        : null;
+                    if (groupsPage.OdataNextLink != null)
+                    {
+                        groupsPage = await graphClient.Groups.WithUrl(groupsPage.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        groupsPage = null;
+                    }
                 }
 
                 // Hide progress bar
@@ -597,19 +592,14 @@ namespace GraphReports
                     }
 
                     // Get the next page if available
-                    groupsPage = groupsPage.OdataNextLink != null
-                        ? await graphClient.Groups.GetAsync(requestConfiguration =>
-                        {
-                            requestConfiguration.QueryParameters.Filter = "groupTypes/any(g:g eq 'Unified')";
-
-                            requestConfiguration.QueryParameters.Select = new[]
-                            {
-                                "Id", "DisplayName", "Description", "Mail", "MailEnabled", "SecurityEnabled",
-                                "Visibility", "GroupTypes", "LicenseProcessingState", "Team","CreatedDateTime"
-                            };
-                            requestConfiguration.QueryParameters.Skip = allGroups.Count;
-                        })
-                        : null;
+                    if (groupsPage.OdataNextLink != null)
+                    {
+                        groupsPage = await graphClient.Groups.WithUrl(groupsPage.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        groupsPage = null;
+                    }
                 }
 
                 // Display the data in a DataGridView
@@ -784,18 +774,14 @@ namespace GraphReports
                     }
 
                     // Get the next page if available
-                    groupsPage = groupsPage.OdataNextLink != null
-                        ? await graphClient.Groups.GetAsync(requestConfiguration =>
-                        {
-                            requestConfiguration.QueryParameters.Select = new[]
-                            {
-                                "Id", "DisplayName", "Description", "Mail", "MailEnabled", "SecurityEnabled",
-                                "Visibility", "GroupTypes", "LicenseProcessingState", "Team", "OnPremisesSyncEnabled",
-                                "OnPremisesLastSyncDateTime", "OnPremisesSecurityIdentifier", "OnPremisesDomainName"
-                            };
-                            requestConfiguration.QueryParameters.Skip = allGroups.Count;
-                        })
-                        : null;
+                    if (groupsPage.OdataNextLink != null)
+                    {
+                        groupsPage = await graphClient.Groups.WithUrl(groupsPage.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        groupsPage = null;
+                    }
                 }
 
                 // Hide progress bar
@@ -894,18 +880,14 @@ namespace GraphReports
                     }
 
                     // Get the next page if available
-                    groupsPage = groupsPage.OdataNextLink != null
-                        ? await graphClient.Groups.GetAsync(requestConfiguration =>
-                        {
-                            requestConfiguration.QueryParameters.Select = new[]
-                            {
-                                "Id", "DisplayName", "Description", "Mail", "MailEnabled", "SecurityEnabled",
-                                "Visibility", "GroupTypes", "LicenseProcessingState", "Team", "OnPremisesSyncEnabled",
-                                "OnPremisesLastSyncDateTime", "OnPremisesSecurityIdentifier", "OnPremisesDomainName"
-                            };
-                            requestConfiguration.QueryParameters.Skip = allGroups.Count;
-                        })
-                        : null;
+                    if (groupsPage.OdataNextLink != null)
+                    {
+                        groupsPage = await graphClient.Groups.WithUrl(groupsPage.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        groupsPage = null;
+                    }
                 }
 
                 // Hide progress bar
@@ -1004,18 +986,14 @@ namespace GraphReports
                     }
 
                     // Get the next page if available
-                    groupsPage = groupsPage.OdataNextLink != null
-                        ? await graphClient.Groups.GetAsync(requestConfiguration =>
-                        {
-                            requestConfiguration.QueryParameters.Select = new[]
-                            {
-                                "Id", "DisplayName", "Description", "Mail", "MailEnabled", "SecurityEnabled",
-                                "Visibility", "GroupTypes", "LicenseProcessingState", "Team", "OnPremisesSyncEnabled",
-                                "OnPremisesLastSyncDateTime", "OnPremisesSecurityIdentifier", "OnPremisesDomainName"
-                            };
-                            requestConfiguration.QueryParameters.Skip = allGroups.Count;
-                        })
-                        : null;
+                    if (groupsPage.OdataNextLink != null)
+                    {
+                        groupsPage = await graphClient.Groups.WithUrl(groupsPage.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        groupsPage = null;
+                    }
                 }
 
                 // Hide progress bar
@@ -1392,19 +1370,14 @@ namespace GraphReports
                     }
 
                     // Get the next page if available
-                    groupsPage = groupsPage.OdataNextLink != null
-                        ? await graphClient.Groups.GetAsync(requestConfiguration =>
-                        {
-                            requestConfiguration.QueryParameters.Filter = "assignedLicenses/any()";
-                            requestConfiguration.QueryParameters.Select = new[]
-                            {
-                                "Id", "DisplayName", "Description", "Mail", "MailEnabled", "SecurityEnabled",
-                                "Visibility", "GroupTypes", "LicenseProcessingState", "Team", "OnPremisesSyncEnabled",
-                                "OnPremisesLastSyncDateTime", "OnPremisesSecurityIdentifier", "OnPremisesDomainName"
-                            };
-                            requestConfiguration.QueryParameters.Skip = allGroups.Count;
-                        })
-                        : null;
+                    if (groupsPage.OdataNextLink != null)
+                    {
+                        groupsPage = await graphClient.Groups.WithUrl(groupsPage.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        groupsPage = null;
+                    }
                 }
 
                 // Hide progress bar
