@@ -131,7 +131,7 @@
             buttonExport.Name = "buttonExport";
             buttonExport.Size = new Size(124, 47);
             buttonExport.TabIndex = 2;
-            buttonExport.Text = "Export to Excel";
+            buttonExport.Text = "Export to CSV";
             buttonExport.UseVisualStyleBackColor = true;
             buttonExport.Click += buttonExport_Click;
             // 
