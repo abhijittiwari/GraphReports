@@ -9,6 +9,8 @@ using System.Diagnostics.Metrics;
 using Microsoft.Graph.Beta;
 using Microsoft.Extensions.Azure;
 using Microsoft.Kiota.Serialization;
+using Azure;
+using NPOI.HSSF.Model;
 
 
 
@@ -460,7 +462,7 @@ namespace GraphReports
                                 OnPremisesLastSyncDateTime = group.OnPremisesLastSyncDateTime?.UtcDateTime.ToString() ?? "Not Available",
                                 OnPremisesSecurityIdentifier = group.OnPremisesSecurityIdentifier ?? "Not Available",
                                 OnPremisesDomainName = group.OnPremisesDomainName ?? "Not Available",
-                                MemberCount = memberCount?? 0
+                                MemberCount = memberCount ?? 0
                             });
                         }
                     }
@@ -565,7 +567,7 @@ namespace GraphReports
                                 LicenseProcessingState = group.LicenseProcessingState?.State ?? "Not Available",
                                 Team = group.Team != null ? "Team Enabled" : "Not a Team",
                                 CreatedDateTime = group.CreatedDateTime?.UtcDateTime.ToString() ?? "Not Available",
-                                 
+
                             }));
                         }
                     }
@@ -1446,7 +1448,7 @@ namespace GraphReports
                     var groupId = groups.Value.First().Id;
 
                     // Fetch group members
-                    var members = await graphClient.Groups[groupId].Members.GetAsync(requestConfiguration=>
+                    var members = await graphClient.Groups[groupId].Members.GetAsync(requestConfiguration =>
                     {
                         requestConfiguration.QueryParameters.Select = new[] { "Id", "displayName", "mail" };
                         requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
@@ -1483,6 +1485,67 @@ namespace GraphReports
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             progressBar1.Visible = false;
+        }
+
+
+
+        private async void buttonMFAReg_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                progressBar1.Visible = true;
+                progressBar1.Style = ProgressBarStyle.Marquee;
+                progressBar1.Text = "Authenticating"; // Set text in progress bar
+                var scopes = new[] { "User.Read.All", "Directory.Read.All", "AuditLog.Read.All", "Reports.Read.All", "UserAuthenticationMethod.Read.All" };
+
+                var tenantId = textBoxTenant.Text;
+                var clientId = textBoxClientID.Text;
+
+                var options = new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ClientId = clientId,
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                    RedirectUri = new Uri("http://localhost"),
+                };
+
+                var interactiveCredential = new InteractiveBrowserCredential(options);
+
+                var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+                var result = await graphClient.Reports.AuthenticationMethods.UserRegistrationDetails.GetAsync();
+                if (result?.Value != null)
+                {
+                    var resultDetail = result.Value.Select(res => new
+                    {
+                        UserPrincipalName = res.UserPrincipalName ?? "Not Available",
+                        DisplayName = res.UserDisplayName ?? "Not Available",
+                        UserType = res.UserType.ToString() ?? "Not Available",
+                        IsAdmin = res.IsAdmin?.ToString() ?? "Not Available",
+                        IsSsprRegistered = res.IsSsprRegistered?.ToString() ?? "Not Available",
+                        IsSsprEnabled = res.IsSsprEnabled?.ToString() ?? "Not Available",
+                        IsSsprCapable = res.IsSsprCapable?.ToString() ?? "Not Available",
+                        IsMfaRegistered = res.IsMfaRegistered?.ToString() ?? "Not Available",
+                        IsMfaCapable = res.IsMfaCapable?.ToString() ?? "Not Available",
+                        IsPasswordlessCapable = res.IsPasswordlessCapable?.ToString() ?? "Not Available",
+                        ReportLastUpdatedDateTime = res.LastUpdatedDateTime?.UtcDateTime.ToString() ?? "Not Available",
+                        MethodsRegistered = res.MethodsRegistered != null && res.MethodsRegistered.Any() ? string.Join(", ", res.MethodsRegistered) : "Not Available",
+                        UserPreferredMethodForSecondaryAuthentication = res.UserPreferredMethodForSecondaryAuthentication?.ToString() ?? "Not Available",
+                    }).ToList();
+                    dataGridView1.DataSource = resultDetail;
+                }
+                else
+                {
+                    MessageBox.Show("No MFA registration details found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                progressBar1.Visible = false;
+            }
         }
     }
 }

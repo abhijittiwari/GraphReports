@@ -54,6 +54,7 @@
             buttonUnifiedGroups = new Button();
             buttonGetAllGroups = new Button();
             tabPage1 = new TabPage();
+            buttonMFAReg = new Button();
             buttonGetAdmins = new Button();
             buttonGetUnlicensed = new Button();
             buttonGetGuests = new Button();
@@ -322,6 +323,7 @@
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(buttonMFAReg);
             tabPage1.Controls.Add(buttonGetAdmins);
             tabPage1.Controls.Add(buttonGetUnlicensed);
             tabPage1.Controls.Add(buttonGetGuests);
@@ -334,6 +336,16 @@
             tabPage1.TabIndex = 0;
             tabPage1.Text = "User Reports";
             tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // buttonMFAReg
+            // 
+            buttonMFAReg.Location = new Point(8, 64);
+            buttonMFAReg.Name = "buttonMFAReg";
+            buttonMFAReg.Size = new Size(128, 52);
+            buttonMFAReg.TabIndex = 5;
+            buttonMFAReg.Text = "Get All Users Auth Registrations";
+            buttonMFAReg.UseVisualStyleBackColor = true;
+            buttonMFAReg.Click += buttonMFAReg_Click;
             // 
             // buttonGetAdmins
             // 
@@ -457,5 +469,6 @@
         private GroupBox groupBox2;
         private TextBox textBoxGroupName;
         private Button buttonGetGroupMembers;
+        private Button buttonMFAReg;
     }
 }
