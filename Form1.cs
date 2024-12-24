@@ -11,6 +11,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Kiota.Serialization;
 using Azure;
 using NPOI.HSSF.Model;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 
 
@@ -54,44 +55,74 @@ namespace GraphReports
                 {
                     requestConfiguration.QueryParameters.Select = new[]
                     {
-                        "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","Manager","SignInActivity"
+                        "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","manager","SignInActivity"
                     };
                 });
-
-                if (usersResponse?.Value != null)
+                while (usersResponse != null)
                 {
-                    var users = usersResponse.Value.Select(user => new
+
+                    if (usersResponse?.Value != null)
                     {
-                        UserType = user.UserType ?? "Not Available",
-                        DisplayName = user.DisplayName ?? "Not Available",
-                        Email = user.Mail ?? "Not Available",
-                        JobTitle = user.JobTitle ?? "Not Available",
-                        UserPrincipalName = user.UserPrincipalName ?? "Not Available",
-                        LastSignInActivity = user.SignInActivity?.LastSignInDateTime?.UtcDateTime.ToString() ?? "No Sign In Activity",
-                        ID = user.Id ?? "Not Available",
-                        AccountEnabled = user.AccountEnabled?.ToString() ?? "Not Available",
-                        Manager = user.Manager?.Id != null ? GetManager(graphClient, user.Manager.Id).Result : "Not Available",
-                        City = user.City ?? "Not Available",
-                        Country = user.Country ?? "Not Available",
-                        Department = user.Department ?? "Not Available",
-                        OfficeLocation = user.OfficeLocation ?? "Not Available",
-                        LastPasswordChangeDateTime = user.LastPasswordChangeDateTime?.UtcDateTime.ToString() ?? "Not Available",
-                        SignInSessionsValidFromDateTime = user.SignInSessionsValidFromDateTime?.UtcDateTime.ToString() ?? "No Sign In Sessions",
-                        OnPremisesImmutableId = user.OnPremisesImmutableId ?? "No Immutable Id",
-                        OnPremisesDistinguishedName = user.OnPremisesDistinguishedName ?? "No Distinguished Name",
-                        OnPremisesLastSyncDateTime = user.OnPremisesLastSyncDateTime?.UtcDateTime.ToString() ?? "No Last Sync DateTime",
-                        SyncEnabled = user.OnPremisesSyncEnabled?.ToString() ?? "Not Synced",
-                        WhenCreated = user.CreatedDateTime?.UtcDateTime.ToString() ?? "Not Available",
-                        ProxyAddresses = user.ProxyAddresses != null && user.ProxyAddresses.Any() ? string.Join(", ", user.ProxyAddresses) : "No Proxy Address",
-                        AssignedLicenses = user.AssignedLicenses != null && user.AssignedLicenses.Any() ? string.Join(", ", user.AssignedLicenses.Where(license => license.SkuId.HasValue).Select(license => Mapping.GetProductNameBySkuId(license.SkuId.Value.ToString()))) : "No Assigned Licenses",
-                        DisabledPlans = user.AssignedLicenses != null && user.AssignedLicenses.Any() ? string.Join(", ", user.AssignedLicenses.SelectMany(license => license.DisabledPlans?.Where(planId => planId.HasValue).Select(planId => ServicePlanMapping.GetServicePlanById(planId.Value.ToString())) ?? Enumerable.Empty<string>())) : "No Disabled Plans"
-                    }).ToList();
+                        var users = usersResponse.Value.Select(user => new
+                        {
+                            UserType = user.UserType ?? "Not Available",
+                            DisplayName = user.DisplayName ?? "Not Available",
+                            Email = user.Mail ?? "Not Available",
+                            JobTitle = user.JobTitle ?? "Not Available",
+                            UserPrincipalName = user.UserPrincipalName ?? "Not Available",
+                            LastSignInActivity = user.SignInActivity?.LastSignInDateTime?.UtcDateTime.ToString() ?? "No Sign In Activity",
+                            ID = user.Id ?? "Not Available",
+                            AccountEnabled = user.AccountEnabled?.ToString() ?? "Not Available",
+                            Manager = user.Manager?.Id != null ? GetManager(graphClient, user.Manager.Id).Result : "Not Available",
+                            City = user.City ?? "Not Available",
+                            Country = user.Country ?? "Not Available",
+                            Department = user.Department ?? "Not Available",
+                            OfficeLocation = user.OfficeLocation ?? "Not Available",
+                            LastPasswordChangeDateTime = user.LastPasswordChangeDateTime?.UtcDateTime.ToString() ?? "Not Available",
+                            SignInSessionsValidFromDateTime = user.SignInSessionsValidFromDateTime?.UtcDateTime.ToString() ?? "No Sign In Sessions",
+                            OnPremisesImmutableId = user.OnPremisesImmutableId ?? "No Immutable Id",
+                            OnPremisesDistinguishedName = user.OnPremisesDistinguishedName ?? "No Distinguished Name",
+                            OnPremisesLastSyncDateTime = user.OnPremisesLastSyncDateTime?.UtcDateTime.ToString() ?? "No Last Sync DateTime",
+                            SyncEnabled = user.OnPremisesSyncEnabled?.ToString() ?? "Not Synced",
+                            WhenCreated = user.CreatedDateTime?.UtcDateTime.ToString() ?? "Not Available",
+                            ProxyAddresses = user.ProxyAddresses != null && user.ProxyAddresses.Any() ? string.Join(", ", user.ProxyAddresses) : "No Proxy Address",
+                            AssignedLicenses = user.AssignedLicenses != null && user.AssignedLicenses.Any() ? string.Join(", ", user.AssignedLicenses.Where(license => license.SkuId.HasValue).Select(license => Mapping.GetProductNameBySkuId(license.SkuId.Value.ToString()))) : "No Assigned Licenses",
+                            DisabledPlans = user.AssignedLicenses != null && user.AssignedLicenses.Any() ? string.Join(", ", user.AssignedLicenses.SelectMany(license => license.DisabledPlans?.Where(planId => planId.HasValue).Select(planId => ServicePlanMapping.GetServicePlanById(planId.Value.ToString())) ?? Enumerable.Empty<string>())) : "No Disabled Plans"
+                        }).ToList();
+                        var allUsers = new List<object>();
 
-                    dataGridView1.DataSource = users;
-                }
-                else
-                {
-                    MessageBox.Show("No users found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        allUsers.AddRange(users);
+
+                        dataGridView1.DataSource = users;
+                        if (usersResponse.OdataNextLink != null)
+                        {
+                            usersResponse = await graphClient.Users.GetAsync(requestConfiguration =>
+                            {
+                                requestConfiguration.QueryParameters.Select = new[]
+                                {
+                                 "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","manager","SignInActivity"
+
+                                };
+                            });
+                        }
+
+                        else
+                        {
+                            usersResponse = null;
+
+                        }
+                        if (allUsers.Any())
+                        {
+                            dataGridView1.DataSource = allUsers;
+                        }
+                        else
+                        {
+                            MessageBox.Show("No users found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+
+
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -267,7 +298,7 @@ namespace GraphReports
                             requestConfiguration.QueryParameters.Filter = "UserType eq 'Guest'";
                             requestConfiguration.QueryParameters.Select = new[]
                             {
-                                "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime"
+                                    "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime"
                             };
                         });
                     }
