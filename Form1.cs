@@ -93,19 +93,14 @@ namespace GraphReports
 
                         allUsers.AddRange(users);
 
-                        dataGridView1.DataSource = users;
+                        //dataGridView1.DataSource = users;
                         if (usersResponse.OdataNextLink != null)
                         {
-                            usersResponse = await graphClient.Users.GetAsync(requestConfiguration =>
-                            {
-                                requestConfiguration.QueryParameters.Select = new[]
-                                {
-                                 "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","manager","SignInActivity"
+                            usersResponse = await graphClient.Users.WithUrl(usersResponse.OdataNextLink).GetAsync(); 
+                            allUsers.AddRange(users);
 
-                                };
-                            });
                         }
-
+                  
                         else
                         {
                             usersResponse = null;
@@ -205,6 +200,17 @@ namespace GraphReports
                         DisabledPlans = user.AssignedLicenses != null && user.AssignedLicenses.Any() ? string.Join(", ", user.AssignedLicenses.SelectMany(license => license.DisabledPlans?.Where(planId => planId.HasValue).Select(planId => ServicePlanMapping.GetServicePlanById(planId.Value.ToString())) ?? Enumerable.Empty<string>())) : "No Disabled Plans"
 
                     }).ToList();
+                    if (usersResponse.OdataNextLink != null)
+                    {
+                        usersResponse = await graphClient.Users.WithUrl(usersResponse.OdataNextLink).GetAsync();
+                    }
+
+                    else
+                    {
+                        usersResponse = null;
+
+                    }
+
                     if (users.Count > 0)
                     {
 
@@ -293,19 +299,15 @@ namespace GraphReports
 
                     if (usersPage.OdataNextLink != null)
                     {
-                        usersPage = await graphClient.Users.GetAsync(requestConfiguration =>
-                        {
-                            requestConfiguration.QueryParameters.Filter = "UserType eq 'Guest'";
-                            requestConfiguration.QueryParameters.Select = new[]
-                            {
-                                    "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime"
-                            };
-                        });
+                        usersPage = await graphClient.Users.WithUrl(usersPage.OdataNextLink).GetAsync();
                     }
+
                     else
                     {
                         usersPage = null;
+
                     }
+
                 }
 
                 // Bind the aggregated user data to the DataGridView
@@ -393,6 +395,17 @@ namespace GraphReports
         AssignedLicenses = "No Assigned Licenses",
         DisabledPlans = "No Disabled Plans"
     }).ToList();
+                    if (usersResponse.OdataNextLink != null)
+                    {
+                        usersResponse = await graphClient.Users.WithUrl(usersResponse.OdataNextLink).GetAsync();
+                    }
+
+                    else
+                    {
+                        usersResponse = null;
+
+                    }
+
 
                     if (unlicensedUsers.Any())
                     {
@@ -1116,6 +1129,8 @@ namespace GraphReports
                     {
                         var members = await graphClient.DirectoryRoles[role.Id].Members.GetAsync();
 
+
+
                         if (members?.Value != null)
                         {
                             foreach (var member in members.Value)
@@ -1145,6 +1160,7 @@ namespace GraphReports
                                     DisplayName = displayName,
                                     ObjectId = member.Id ?? "Not Available"
                                 });
+
                             }
                         }
                     }
@@ -1505,26 +1521,46 @@ namespace GraphReports
                 var interactiveCredential = new InteractiveBrowserCredential(options);
 
                 var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+                var allResults = new List<object>();
                 var result = await graphClient.Reports.AuthenticationMethods.UserRegistrationDetails.GetAsync();
-                if (result?.Value != null)
+
+                while (result != null)
                 {
-                    var resultDetail = result.Value.Select(res => new
+                    if (result?.Value != null)
                     {
-                        UserPrincipalName = res.UserPrincipalName ?? "Not Available",
-                        DisplayName = res.UserDisplayName ?? "Not Available",
-                        UserType = res.UserType.ToString() ?? "Not Available",
-                        IsAdmin = res.IsAdmin?.ToString() ?? "Not Available",
-                        IsSsprRegistered = res.IsSsprRegistered?.ToString() ?? "Not Available",
-                        IsSsprEnabled = res.IsSsprEnabled?.ToString() ?? "Not Available",
-                        IsSsprCapable = res.IsSsprCapable?.ToString() ?? "Not Available",
-                        IsMfaRegistered = res.IsMfaRegistered?.ToString() ?? "Not Available",
-                        IsMfaCapable = res.IsMfaCapable?.ToString() ?? "Not Available",
-                        IsPasswordlessCapable = res.IsPasswordlessCapable?.ToString() ?? "Not Available",
-                        ReportLastUpdatedDateTime = res.LastUpdatedDateTime?.UtcDateTime.ToString() ?? "Not Available",
-                        MethodsRegistered = res.MethodsRegistered != null && res.MethodsRegistered.Any() ? string.Join(", ", res.MethodsRegistered) : "Not Available",
-                        UserPreferredMethodForSecondaryAuthentication = res.UserPreferredMethodForSecondaryAuthentication?.ToString() ?? "Not Available",
-                    }).ToList();
-                    dataGridView1.DataSource = resultDetail;
+                        var resultDetail = result.Value.Select(res => new
+                        {
+                            UserPrincipalName = res.UserPrincipalName ?? "Not Available",
+                            DisplayName = res.UserDisplayName ?? "Not Available",
+                            UserType = res.UserType.ToString() ?? "Not Available",
+                            IsAdmin = res.IsAdmin?.ToString() ?? "Not Available",
+                            IsSsprRegistered = res.IsSsprRegistered?.ToString() ?? "Not Available",
+                            IsSsprEnabled = res.IsSsprEnabled?.ToString() ?? "Not Available",
+                            IsSsprCapable = res.IsSsprCapable?.ToString() ?? "Not Available",
+                            IsMfaRegistered = res.IsMfaRegistered?.ToString() ?? "Not Available",
+                            IsMfaCapable = res.IsMfaCapable?.ToString() ?? "Not Available",
+                            IsPasswordlessCapable = res.IsPasswordlessCapable?.ToString() ?? "Not Available",
+                            ReportLastUpdatedDateTime = res.LastUpdatedDateTime?.UtcDateTime.ToString() ?? "Not Available",
+                            MethodsRegistered = res.MethodsRegistered != null && res.MethodsRegistered.Any() ? string.Join(", ", res.MethodsRegistered) : "Not Available",
+                            UserPreferredMethodForSecondaryAuthentication = res.UserPreferredMethodForSecondaryAuthentication?.ToString() ?? "Not Available",
+                        }).ToList();
+
+                        allResults.AddRange(resultDetail);
+                    }
+
+                    if (result.OdataNextLink != null)
+                    {
+                        result = await graphClient.Reports.AuthenticationMethods.UserRegistrationDetails.WithUrl(result.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        result = null;
+                    }
+                }
+
+                if (allResults.Any())
+                {
+                    dataGridView1.DataSource = allResults;
                 }
                 else
                 {
