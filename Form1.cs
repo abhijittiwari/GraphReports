@@ -4,14 +4,13 @@ using System.Net.Http.Headers;
 using Azure.Core;
 using Azure.Identity;
 using System.Text.Json;
-using Microsoft.Graph.Models;
+using Microsoft.Graph.Beta.Models;
 using System.Diagnostics.Metrics;
 using Microsoft.Graph.Beta;
 using Microsoft.Extensions.Azure;
 using Microsoft.Kiota.Serialization;
 using Azure;
-using NPOI.HSSF.Model;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+
 
 
 
@@ -1091,100 +1090,120 @@ namespace GraphReports
             progressBar1.Visible = false;
         }
 
+
+
         private async void buttonGetAdmins_Click(object sender, EventArgs e)
         {
             progressBar1.Visible = true;
             progressBar1.Style = ProgressBarStyle.Marquee;
+
             try
             {
+                // Define required scopes
                 var scopes = new[] { "RoleManagement.Read.Directory", "User.Read.All", "Directory.Read.All" };
 
-                // Tenant ID and Client ID from textboxes
-                var tenantId = textBoxTenant.Text;
-                var clientId = textBoxClientID.Text;
+                // Retrieve Tenant ID and Client ID from textboxes
+                var tenantId = textBoxTenant.Text.Trim();
+                var clientId = textBoxClientID.Text.Trim();
 
-                // Interactive browser credential options
-                var options = new InteractiveBrowserCredentialOptions
+                if (string.IsNullOrWhiteSpace(tenantId) || string.IsNullOrWhiteSpace(clientId))
+                {
+                    MessageBox.Show("Please enter both Tenant ID and Client ID.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Set up interactive browser credential options
+                var credentialOptions = new InteractiveBrowserCredentialOptions
                 {
                     TenantId = tenantId,
                     ClientId = clientId,
                     AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
-                    RedirectUri = new Uri("http://localhost"),
+                    RedirectUri = new Uri("http://localhost")
                 };
 
-                var interactiveCredential = new InteractiveBrowserCredential(options);
+                var interactiveCredential = new InteractiveBrowserCredential(credentialOptions);
                 var graphClient = new GraphServiceClient(interactiveCredential, scopes);
 
-                // Initialize progress bar
-                progressBar1.Text = "Getting RBAC Role Members";
+                // Update progress bar message
+                progressBar1.Text = "Fetching Roles and Members...";
 
-                // Fetch roles
+                // Get all roles
                 var roles = await graphClient.DirectoryRoles.GetAsync();
 
-                if (roles?.Value != null)
+                if (roles?.Value == null || !roles.Value.Any())
                 {
-                    var roleMembers = new List<dynamic>();
+                    MessageBox.Show("No roles found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
-                    foreach (var role in roles.Value)
-                    {
-                        var members = await graphClient.DirectoryRoles[role.Id].Members.GetAsync();
+                var roleMembers = await FetchRoleMembers(graphClient, roles.Value);
 
-
-
-                        if (members?.Value != null)
-                        {
-                            foreach (var member in members.Value)
-                            {
-                                string displayName = "Not Available";
-                                if (member.OdataType == "#microsoft.graph.user")
-                                {
-                                    var user = await graphClient.Users[member.Id].GetAsync();
-                                    displayName = user?.DisplayName ?? "Not Available";
-                                }
-                                else if (member.OdataType == "#microsoft.graph.group")
-                                {
-                                    var group = await graphClient.Groups[member.Id].GetAsync();
-                                    displayName = group?.DisplayName ?? "Not Available";
-                                }
-
-                                else if (member.OdataType == "#microsoft.graph.servicePrincipal")
-                                {
-                                    var servicename = await graphClient.ServicePrincipals[member.Id].GetAsync();
-                                    displayName = servicename?.AppDisplayName ?? "Not Available";
-
-                                }
-                                roleMembers.Add(new
-                                {
-                                    RoleName = role.DisplayName ?? "Not Available",
-                                    MemberType = member.OdataType ?? "Not Available",
-                                    DisplayName = displayName,
-                                    ObjectId = member.Id ?? "Not Available"
-                                });
-
-                            }
-                        }
-                    }
-
-                    if (roleMembers.Any())
-                    {
-                        dataGridView1.DataSource = roleMembers;
-                    }
-                    else
-                    {
-                        MessageBox.Show("No role members found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                if (roleMembers.Any())
+                {
+                    dataGridView1.DataSource = roleMembers;
                 }
                 else
                 {
-                    MessageBox.Show("No roles found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("No role members found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+            }
+            catch (AuthenticationFailedException ex)
+            {
+                MessageBox.Show($"Authentication failed: {ex.Message}", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Microsoft Graph service error: {ex.Message}", "Service Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            progressBar1.Visible = false;
+            finally
+            {
+                progressBar1.Visible = false;
+            }
         }
+
+        private async Task<List<dynamic>> FetchRoleMembers(GraphServiceClient graphClient, IEnumerable<DirectoryRole> roles)
+        {
+            var roleMembers = new List<dynamic>();
+
+            foreach (var role in roles)
+            {
+                var members = await graphClient.DirectoryRoles[role.Id].Members.GetAsync();
+                if (members?.Value == null) continue;
+
+                foreach (var member in members.Value)
+                {
+                    var displayName = await GetMemberDisplayName(graphClient, member);
+                    roleMembers.Add(new
+                    {
+                        RoleName = role.DisplayName ?? "Not Available",
+                        MemberType = member.OdataType ?? "Not Available",
+                        DisplayName = displayName,
+                        ObjectId = member.Id ?? "Not Available"
+                    });
+                }
+            }
+
+            return roleMembers;
+        }
+
+        private async Task<string> GetMemberDisplayName(GraphServiceClient graphClient, DirectoryObject member)
+        {
+            try
+            {
+                return member.OdataType switch
+                {
+                    "#microsoft.graph.user" => (await graphClient.Users[member.Id].GetAsync())?.DisplayName ?? "Not Available",
+                    "#microsoft.graph.group" => (await graphClient.Groups[member.Id].GetAsync())?.DisplayName ?? "Not Available",
+                    "#microsoft.graph.servicePrincipal" => (await graphClient.ServicePrincipals[member.Id].GetAsync())?.AppDisplayName ?? "Not Available",
+                    _ => "Unknown Member Type"
+                };
+            }
+            catch
+            {
+                return "Not Available";
+            }
+        }
+
 
         private async void buttonGetDomains_Click(object sender, EventArgs e)
         {
