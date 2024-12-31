@@ -10,6 +10,7 @@ using Microsoft.Graph.Beta;
 using Microsoft.Extensions.Azure;
 using Microsoft.Kiota.Serialization;
 using Azure;
+using System.Reflection;
 
 
 
@@ -1435,17 +1436,104 @@ namespace GraphReports
             }
         }
 
+        //private async void buttonGetGroupMembers_Click(object sender, EventArgs e)
+        //{
+        //    progressBar1.Visible = true;
+        //    progressBar1.Style = ProgressBarStyle.Marquee;
+        //    try
+        //    {
+        //        var scopes = new[] { "Group.Read.All", "GroupMember.Read.All", "Directory.Read.All" };
+
+        //        // Tenant ID and Client ID from textboxes
+        //        var tenantId = textBoxTenant.Text;
+        //        var clientId = textBoxClientID.Text;
+
+        //        // Interactive browser credential options
+        //        var options = new InteractiveBrowserCredentialOptions
+        //        {
+        //            TenantId = tenantId,
+        //            ClientId = clientId,
+        //            AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+        //            RedirectUri = new Uri("http://localhost"),
+        //        };
+
+        //        var interactiveCredential = new InteractiveBrowserCredential(options);
+        //        var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+
+        //        // Initialize progress bar
+        //        progressBar1.Text = "Getting Group Members";
+
+        //        // Fetch group by display name
+        //        var groupName = textBoxGroupName.Text;
+        //        var groups = await graphClient.Groups.GetAsync(requestConfiguration =>
+        //        {
+        //            requestConfiguration.QueryParameters.Filter = $"startswith(displayName,'{groupName}')";
+
+        //            requestConfiguration.QueryParameters.Select = new[] { "Id", "DisplayName" };
+        //        });
+
+        //        if (groups?.Value != null && groups.Value.Any())
+        //        {
+        //            var groupId = groups.Value.First().Id;
+
+        //            // Fetch group members
+        //            var members = await graphClient.Groups[groupId].Members.GetAsync(requestConfiguration =>
+        //            {
+        //                requestConfiguration.QueryParameters.Select = new[] { "Id", "displayName", "mail" };
+        //                requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+
+        //            });
+
+        //            if (members?.Value != null)
+        //            {
+        //                var memberList = members.Value.Select(member => new
+        //                {
+        //                    DisplayName = member.AdditionalData?.ContainsKey("displayName") == true
+        //                        ? member.AdditionalData["displayName"]?.ToString()
+        //                        : "Not Available",
+        //                    mail = member.AdditionalData?.ContainsKey("mail") == true
+        //                        ? member.AdditionalData["userPrincipalName"]?.ToString()
+        //                        : "Not Available",
+        //                    Id = member.Id ?? "Not Available"
+        //                }).ToList();
+
+        //                dataGridView1.DataSource = memberList;
+        //            }
+        //            else
+        //            {
+        //                MessageBox.Show("No members found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show("Group not found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //    progressBar1.Visible = false;
+        //}
         private async void buttonGetGroupMembers_Click(object sender, EventArgs e)
         {
             progressBar1.Visible = true;
             progressBar1.Style = ProgressBarStyle.Marquee;
+
             try
             {
+                // Define required scopes
                 var scopes = new[] { "Group.Read.All", "GroupMember.Read.All", "Directory.Read.All" };
 
-                // Tenant ID and Client ID from textboxes
-                var tenantId = textBoxTenant.Text;
-                var clientId = textBoxClientID.Text;
+                // Retrieve Tenant ID and Client ID from textboxes
+                var tenantId = textBoxTenant.Text.Trim();
+                var clientId = textBoxClientID.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(tenantId) || string.IsNullOrWhiteSpace(clientId))
+                {
+                    MessageBox.Show("Please enter both Tenant ID and Client ID.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
                 // Interactive browser credential options
                 var options = new InteractiveBrowserCredentialOptions
@@ -1460,14 +1548,19 @@ namespace GraphReports
                 var graphClient = new GraphServiceClient(interactiveCredential, scopes);
 
                 // Initialize progress bar
-                progressBar1.Text = "Getting Group Members";
+                progressBar1.Text = "Getting Group Members...";
 
                 // Fetch group by display name
-                var groupName = textBoxGroupName.Text;
+                var groupName = textBoxGroupName.Text.Trim();
+                if (string.IsNullOrWhiteSpace(groupName))
+                {
+                    MessageBox.Show("Please enter a group name.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 var groups = await graphClient.Groups.GetAsync(requestConfiguration =>
                 {
                     requestConfiguration.QueryParameters.Filter = $"startswith(displayName,'{groupName}')";
-
                     requestConfiguration.QueryParameters.Select = new[] { "Id", "DisplayName" };
                 });
 
@@ -1478,42 +1571,81 @@ namespace GraphReports
                     // Fetch group members
                     var members = await graphClient.Groups[groupId].Members.GetAsync(requestConfiguration =>
                     {
-                        requestConfiguration.QueryParameters.Select = new[] { "Id", "displayName", "mail" };
+                        requestConfiguration.QueryParameters.Select = new[] { "Id", "displayName", "userPrincipalName", "mail" };
                         requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
-
                     });
 
                     if (members?.Value != null)
                     {
-                        var memberList = members.Value.Select(member => new
+                        // Retrieve members with detailed properties
+                        var memberList = new List<dynamic>();
+                        foreach (var member in members.Value)
                         {
-                            DisplayName = member.AdditionalData?.ContainsKey("displayName") == true
-                                ? member.AdditionalData["displayName"]?.ToString()
-                                : "Not Available",
-                            mail = member.AdditionalData?.ContainsKey("mail") == true
-                                ? member.AdditionalData["userPrincipalName"]?.ToString()
-                                : "Not Available",
-                            Id = member.Id ?? "Not Available"
-                        }).ToList();
+                            string displayName = "Not Available";
+                            string mail = "Not Available";
+                            string userPrincipalName = "Not Available";
+                            string objectType = "Unknown";
 
-                        dataGridView1.DataSource = memberList;
+                            if (member.OdataType == "#microsoft.graph.user")
+                            {
+                                var user = await graphClient.Users[member.Id].GetAsync();
+                                displayName = user?.DisplayName ?? "Not Available";
+                                mail = user?.Mail ?? "Not Available";
+                                userPrincipalName = user?.UserPrincipalName ?? "Not Available";
+                                objectType = "User";
+                            }
+                            else if (member.OdataType == "#microsoft.graph.group")
+                            {
+                                var group = await graphClient.Groups[member.Id].GetAsync();
+                                displayName = group?.DisplayName ?? "Not Available";
+                                objectType = "Group";
+                            }
+                            else if (member.OdataType == "#microsoft.graph.servicePrincipal")
+                            {
+                                var servicePrincipal = await graphClient.ServicePrincipals[member.Id].GetAsync();
+                                displayName = servicePrincipal?.AppDisplayName ?? "Not Available";
+                                objectType = "Service Principal";
+                            }
+
+                            memberList.Add(new
+                            {
+                                DisplayName = displayName,
+                                Mail = mail,
+                                UserPrincipalName = userPrincipalName,
+                                ObjectType = objectType,
+                                Id = member.Id ?? "Not Available"
+                            });
+                        }
+
+                        if (memberList.Any())
+                        {
+                            dataGridView1.DataSource = memberList;
+                        }
+                        else
+                        {
+                            MessageBox.Show("No members found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("No members found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("No members found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Group not found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Group not found.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            progressBar1.Visible = false;
+            finally
+            {
+                progressBar1.Visible = false;
+            }
         }
+
 
 
 
