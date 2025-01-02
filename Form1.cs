@@ -22,7 +22,6 @@ namespace GraphReports
         }
 
 
-
         private async void buttonGetAllUsers_Click(object sender, EventArgs e)
         {
             try
@@ -92,11 +91,11 @@ namespace GraphReports
                         //dataGridView1.DataSource = users;
                         if (usersResponse.OdataNextLink != null)
                         {
-                            usersResponse = await graphClient.Users.WithUrl(usersResponse.OdataNextLink).GetAsync(); 
+                            usersResponse = await graphClient.Users.WithUrl(usersResponse.OdataNextLink).GetAsync();
                             allUsers.AddRange(users);
 
                         }
-                  
+
                         else
                         {
                             usersResponse = null;
@@ -1722,5 +1721,203 @@ namespace GraphReports
                 progressBar1.Visible = false;
             }
         }
+
+        private async void buttonGetAllDevices_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                progressBar1.Visible = true;
+                progressBar1.Style = ProgressBarStyle.Marquee;
+                progressBar1.Text = "Authenticating"; // Set text in progress bar
+                var scopes = new[] { "Device.Read.All", "Directory.Read.All" };
+
+                var tenantId = textBoxTenant.Text.Trim();
+                var clientId = textBoxClientID.Text.Trim();
+
+                var options = new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ClientId = clientId,
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                    RedirectUri = new Uri("http://localhost"),
+                };
+
+                var interactiveCredential = new InteractiveBrowserCredential(options);
+                var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+
+                var allDevices = new List<object>();
+                var devicesPage = await graphClient.Devices.GetAsync(requestConfiguration =>
+                {
+                    requestConfiguration.QueryParameters.Select = new[]
+                    {
+                        "id","approximateLastSignInDateTime", "AccountEnabled","displayName", "operatingSystem","OnPremisesSyncEnabled","Manufacturer","operatingSystemVersion", "deviceId", "deviceOwnership", "deviceManagementAppId", "isCompliant", "isManaged", "trustType","Manufacturer","RegisteredOwners"
+                    };
+                });
+
+                while (devicesPage != null)
+                {
+                    if (devicesPage.Value != null)
+                    {
+                        var devices = devicesPage.Value.Select(async device => new
+                        {
+                            Id = device.Id ?? "Not Available",
+                            DisplayName = device.DisplayName ?? "Not Available",
+                            OperatingSystem = device.OperatingSystem ?? "Not Available",
+                            OperatingSystemVersion = device.OperatingSystemVersion ?? "Not Available",
+                            DeviceId = device.DeviceId ?? "Not Available",
+                            DeviceOwnership = device.DeviceOwnership ?? "Not Available",
+                            IsCompliant = device.IsCompliant.HasValue ? (device.IsCompliant.Value ? "True" : "False") : "Not Available",
+                            IsManaged = device.IsManaged?.ToString() ?? "Not Available",
+                            OnPremisesSyncEnabled = device.OnPremisesSyncEnabled.HasValue ? (device.OnPremisesSyncEnabled.Value ? "Enabled" : "Disabled") : "Disabled",
+                            Manufacturer = device.Manufacturer ?? "Not Available",
+                            TrustType = device.TrustType ?? "Not Available",
+                            LastSigninActivity = device.ApproximateLastSignInDateTime.HasValue ? device.ApproximateLastSignInDateTime.Value.ToUniversalTime().ToString() : "Not Available",
+                            DeviceAccountStatus = device.AccountEnabled.HasValue ? device.AccountEnabled.Value.ToString() : "Not Available",
+                            Owner = await GetDeviceOwner(graphClient, device.Id)
+                        }).ToList();
+
+                        allDevices.AddRange(await Task.WhenAll(devices));
+                    }
+
+                    if (devicesPage.OdataNextLink != null)
+                    {
+                        devicesPage = await graphClient.Devices.WithUrl(devicesPage.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        devicesPage = null;
+                    }
+                }
+
+                if (allDevices.Any())
+                {
+                    dataGridView1.DataSource = allDevices;
+
+                }
+                else
+                {
+                    MessageBox.Show("No devices found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                progressBar1.Visible = false;
+            }
+        }
+
+
+
+
+
+        private async void buttonNonComplaintDevices_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                progressBar1.Visible = true;
+                progressBar1.Style = ProgressBarStyle.Marquee;
+                progressBar1.Text = "Authenticating"; // Set text in progress bar
+                var scopes = new[] { "Device.Read.All", "Directory.Read.All" };
+
+                var tenantId = textBoxTenant.Text.Trim();
+                var clientId = textBoxClientID.Text.Trim();
+
+                var options = new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ClientId = clientId,
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                    RedirectUri = new Uri("http://localhost"),
+                };
+
+                var interactiveCredential = new InteractiveBrowserCredential(options);
+                var graphClient = new GraphServiceClient(interactiveCredential, scopes);
+
+                var allDevices = new List<object>();
+                var devicesPage = await graphClient.Devices.GetAsync(requestConfiguration =>
+                {
+                    requestConfiguration.QueryParameters.Filter = "isCompliant eq false";
+                    requestConfiguration.QueryParameters.Select = new[]
+                    {
+                        "id","approximateLastSignInDateTime","AccountEnabled","displayName", "operatingSystem","OnPremisesSyncEnabled","Manufacturer","operatingSystemVersion", "deviceId", "deviceOwnership", "deviceManagementAppId", "isCompliant", "isManaged", "trustType","Manufacturer","RegisteredOwners"
+                    };
+                });
+
+                while (devicesPage != null)
+                {
+                    if (devicesPage.Value != null)
+                    {
+                        var devices = devicesPage.Value.Select(async device => new
+                        {
+                            Id = device.Id ?? "Not Available",
+                            DisplayName = device.DisplayName ?? "Not Available",
+                            OperatingSystem = device.OperatingSystem ?? "Not Available",
+                            OperatingSystemVersion = device.OperatingSystemVersion ?? "Not Available",
+                            DeviceId = device.DeviceId ?? "Not Available",
+                            DeviceOwnership = device.DeviceOwnership ?? "Not Available",
+                            IsCompliant = device.IsCompliant.HasValue ? (device.IsCompliant.Value ? "True" : "False") : "Not Available",
+                            IsManaged = device.IsManaged?.ToString() ?? "Not Available",
+                            OnPremisesSyncEnabled = device.OnPremisesSyncEnabled.HasValue ? (device.OnPremisesSyncEnabled.Value ? "Enabled" : "Disabled") : "Disabled",
+                            Manufacturer = device.Manufacturer ?? "Not Available",
+                            TrustType = device.TrustType ?? "Not Available",
+                            LastSigninActivity = device.ApproximateLastSignInDateTime.HasValue ? device.ApproximateLastSignInDateTime.Value.ToUniversalTime().ToString() : "Not Available",
+                            DeviceAccountStatus = device.AccountEnabled.HasValue ? device.AccountEnabled.Value.ToString() : "Not Available",
+                            ComplianceExpirationDateTime = device.ComplianceExpirationDateTime.HasValue ? device.ComplianceExpirationDateTime.Value.ToUniversalTime().ToString() : "Not Available",
+                            Owner = await GetDeviceOwner(graphClient, device.Id)
+                        }).ToList();
+
+                        allDevices.AddRange(await Task.WhenAll(devices));
+                    }
+
+                    if (devicesPage.OdataNextLink != null)
+                    {
+                        devicesPage = await graphClient.Devices.WithUrl(devicesPage.OdataNextLink).GetAsync();
+                    }
+                    else
+                    {
+                        devicesPage = null;
+                    }
+                }
+
+                if (allDevices.Any())
+                {
+                    dataGridView1.DataSource = allDevices;
+
+                }
+                else
+                {
+                    MessageBox.Show("No devices found", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                progressBar1.Visible = false;
+            }
+        }
+
+        private async Task<string> GetDeviceOwner(GraphServiceClient graphClient, string deviceId)
+        {
+            var owners = await graphClient.Devices[deviceId].RegisteredOwners.GetAsync();
+            if (owners?.Value != null && owners.Value.Any())
+            {
+                var owner = owners.Value.First();
+                if (owner.OdataType == "#microsoft.graph.user")
+                {
+                    var user = await graphClient.Users[owner.Id].GetAsync();
+                    return user?.DisplayName ?? "Not Available";
+                }
+            }
+            return "Not Available";
+
+        }
+
     }
 }

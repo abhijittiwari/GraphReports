@@ -38,6 +38,8 @@
             dataGridView1 = new DataGridView();
             progressBar1 = new ProgressBar();
             tabPage3 = new TabPage();
+            buttonGetAllDevices = new Button();
+            buttonNonComplaintDevices = new Button();
             groupBox1 = new GroupBox();
             textBoxDomainName = new TextBox();
             buttonGetDomainDependency = new Button();
@@ -157,6 +159,8 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(buttonGetAllDevices);
+            tabPage3.Controls.Add(buttonNonComplaintDevices);
             tabPage3.Controls.Add(groupBox1);
             tabPage3.Controls.Add(buttonGetDomains);
             tabPage3.Controls.Add(buttonGetSubs);
@@ -166,6 +170,26 @@
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Other Reports";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // buttonGetAllDevices
+            // 
+            buttonGetAllDevices.Location = new Point(3, 61);
+            buttonGetAllDevices.Name = "buttonGetAllDevices";
+            buttonGetAllDevices.Size = new Size(128, 52);
+            buttonGetAllDevices.TabIndex = 8;
+            buttonGetAllDevices.Text = "Get All Devices";
+            buttonGetAllDevices.UseVisualStyleBackColor = true;
+            buttonGetAllDevices.Click += buttonGetAllDevices_Click;
+            // 
+            // buttonNonComplaintDevices
+            // 
+            buttonNonComplaintDevices.Location = new Point(137, 61);
+            buttonNonComplaintDevices.Name = "buttonNonComplaintDevices";
+            buttonNonComplaintDevices.Size = new Size(128, 52);
+            buttonNonComplaintDevices.TabIndex = 7;
+            buttonNonComplaintDevices.Text = "Get Non Complaint Devices";
+            buttonNonComplaintDevices.UseVisualStyleBackColor = true;
+            buttonNonComplaintDevices.Click += buttonNonComplaintDevices_Click;
             // 
             // groupBox1
             // 
@@ -469,5 +493,7 @@
         private TextBox textBoxGroupName;
         private Button buttonGetGroupMembers;
         private Button buttonMFAReg;
+        private Button buttonNonComplaintDevices;
+        private Button buttonGetAllDevices;
     }
 }
