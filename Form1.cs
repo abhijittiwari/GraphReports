@@ -5,12 +5,8 @@ using Azure.Core;
 using Azure.Identity;
 using System.Text.Json;
 using Microsoft.Graph.Beta.Models;
-using System.Diagnostics.Metrics;
 using Microsoft.Graph.Beta;
-using Microsoft.Extensions.Azure;
 using Microsoft.Kiota.Serialization;
-using Azure;
-using System.Reflection;
 
 
 
@@ -55,7 +51,7 @@ namespace GraphReports
                 {
                     requestConfiguration.QueryParameters.Select = new[]
                     {
-                        "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","manager","SignInActivity"
+                        "UserType","City","Country","displayName","OfficeLocation", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","Manager","SignInActivity"
                     };
                 });
                 while (usersResponse != null)
@@ -168,7 +164,8 @@ namespace GraphReports
                     requestConfiguration.QueryParameters.Filter = "onPremisesSyncEnabled eq true";
                     requestConfiguration.QueryParameters.Select = new[]
                     {
-                        "UserType","displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","Manager"
+                        "UserType","City","Country","displayName","OfficeLocation", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","Manager","SignInActivity"
+
                     };
                 });
 
@@ -356,11 +353,9 @@ namespace GraphReports
                 {
                     requestConfiguration.QueryParameters.Select = new[]
                     {
-        "UserType", "displayName", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled",
-        "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors",
-        "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName",
-        "OnPremisesLastSyncDateTime","AccountEnabled","Manager"
-    };
+                         "UserType","City","Country","displayName","OfficeLocation", "Mail", "jobTitle", "UserPrincipalName", "Id", "OnPremisesSyncEnabled", "CreatedDateTime", "ProxyAddresses", "AssignedLicenses", "AssignedPlans", "ServiceProvisioningErrors", "SignInSessionsValidFromDateTime", "OnPremisesImmutableId", "OnPremisesDistinguishedName", "OnPremisesLastSyncDateTime","AccountEnabled","Manager","SignInActivity"
+
+                    };
                 });
 
                 if (usersResponse?.Value != null)
