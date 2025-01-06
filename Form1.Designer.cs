@@ -265,7 +265,7 @@
             groupBox2.Controls.Add(textBoxGroupName);
             groupBox2.Controls.Add(buttonGetGroupMembers);
             groupBox2.Font = new Font("Segoe UI", 6.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupBox2.Location = new Point(542, 6);
+            groupBox2.Location = new Point(408, 6);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(128, 116);
             groupBox2.TabIndex = 7;
@@ -311,7 +311,7 @@
             // 
             // buttonGetAllSec
             // 
-            buttonGetAllSec.Location = new Point(408, 6);
+            buttonGetAllSec.Location = new Point(274, 64);
             buttonGetAllSec.Name = "buttonGetAllSec";
             buttonGetAllSec.Size = new Size(128, 52);
             buttonGetAllSec.TabIndex = 4;
