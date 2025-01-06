@@ -577,7 +577,7 @@ namespace GraphReports
                             {
                                 requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
                             });
-                            allGroups.AddRange(groupsPage.Value.Select(group => new
+                            allGroups.Add(new
                             {
                                 Id = group.Id ?? "Not Available",
                                 DisplayName = group.DisplayName ?? "Not Available",
@@ -587,14 +587,11 @@ namespace GraphReports
                                 MailEnabled = group.MailEnabled?.ToString() ?? "Not Available",
                                 SecurityEnabled = group.SecurityEnabled?.ToString() ?? "Not Available",
                                 Visibility = group.Visibility ?? "Not Available",
-                                GroupTypes = group.GroupTypes != null && group.GroupTypes.Any()
-                                ? string.Join(", ", group.GroupTypes)
-                                : "Not Available",
+                                GroupTypes = group.GroupTypes?.Any() == true ? string.Join(", ", group.GroupTypes) : "Not Available",
                                 LicenseProcessingState = group.LicenseProcessingState?.State ?? "Not Available",
                                 Team = group.Team != null ? "Team Enabled" : "Not a Team",
                                 CreatedDateTime = group.CreatedDateTime?.UtcDateTime.ToString() ?? "Not Available",
-
-                            }));
+                            });
                         }
                     }
 
